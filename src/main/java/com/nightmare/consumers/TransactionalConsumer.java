@@ -28,10 +28,10 @@ public class TransactionalConsumer {
     public static void main(String[] args) {
 
 
-        String topic = "demotopic";
+        String topic = "simple_transactional_topic";
         Properties consumerConfig = new Properties();
         consumerConfig.put("group.id", "my-group");
-        consumerConfig.put("bootstrap.servers", "172.17.176.201:9092");
+        consumerConfig.put("bootstrap.servers", "192.168.118.116:9092");
         consumerConfig.put("auto.offset.reset", "earliest");
         consumerConfig.put("enable.auto.commit", "false");
         consumerConfig.put("isolation.level", "read_committed");

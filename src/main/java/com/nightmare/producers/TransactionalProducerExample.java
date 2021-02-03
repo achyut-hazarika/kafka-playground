@@ -32,12 +32,12 @@ public class TransactionalProducerExample {
 
         try {
 
-            String topic = "demotopic";
+            String topic = "simple_transactional_topic";
             Properties producerConfig = new Properties();
-            producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.17.176.201:9092");
+            producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.118.116:9092");
             producerConfig.put(ProducerConfig.CLIENT_ID_CONFIG, "transactional-producer");
             producerConfig.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true); // enable idempotence
-            producerConfig.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "test-transactional-id"); // set transaction id
+            producerConfig.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "demo-transactional-id"); // set transaction id
             producerConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
             producerConfig.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
@@ -46,14 +46,14 @@ public class TransactionalProducerExample {
             producer.initTransactions(); //initiate transactions
 
             producer.beginTransaction(); //begin transactions
-            for (int i = 0; i < 5; i++) {
-                System.out.println("Sending message " + (i + 1));
+            for (int i = 16; i < 20; i++) {
+                System.out.println("Sending message " + i);
                 ProducerRecord record = new ProducerRecord<String, String>(topic, i + "", "A message from an idempotent producer");
                 producer.send(record).get();
-                if (i == 3) {
+                if (i == 18) {
                     //To test that the consumer doesn't read the messages till the whole batch is committed
                     //Comment this section to let the consumer read the messages.
-                    throw new Exception("A self-destructive exception");
+                  throw new Exception("A self-destructive exception");
                 }
             }
             producer.commitTransaction(); //commit

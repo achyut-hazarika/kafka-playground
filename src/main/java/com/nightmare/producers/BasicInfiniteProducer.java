@@ -22,7 +22,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.Properties;
 
-public class BasicProducerExample {
+public class BasicInfiniteProducer {
 
     public static void main(String[] args) throws Exception {
 
@@ -31,25 +31,26 @@ public class BasicProducerExample {
             boolean syncSend = false;
             String topic = "partitioned_topic";
             Properties producerConfig = new Properties();
-            producerConfig.put("bootstrap.servers", "192.168.118.122:9092");
+            producerConfig.put("bootstrap.servers", "192.168.118.120:9092");
             producerConfig.put("client.id", "basic-producer");
             producerConfig.put("acks", "all");
             producerConfig.put("retries", "3");
             producerConfig.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
             producerConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-
+            producerConfig.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, YetAnotherCustomPartitioner.class);
 
             SimpleProducer<String, String> producer = new SimpleProducer<>(producerConfig, syncSend);
+            int i = 1;
+            while (true) {
 
-            for (int i = 12; i < 20; i++) {
+                //  for (int i = 12; i < 20; i++) {
                 System.out.println("Sending message ");
-                producer.send(topic, "" + i, "This is Message no " + i);
-
-
+                producer.send(topic, "" + System.currentTimeMillis(), "This is Message no " + i);
+                Thread.sleep(2000);
+                i++;
+                //}
             }
-
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             throw e;
         }
     }

@@ -44,11 +44,18 @@ public class SimpleProducer<K extends Serializable, V extends Serializable> {
         logger.info("Started Producer.  sync  : {}", syncSend);
     }
 
+    public void send(ProducerRecord<K, V> producerRecord) {
+        send(producerRecord.topic(), producerRecord.key(), producerRecord.value());
+    }
+
+
     public void send(String topic, V v) {
+        System.out.println("sending");
         send(topic, -1, null, v, new DummyCallback());
     }
 
     public void send(String topic, K k, V v) {
+        System.out.println("Syncsend: "+this.syncSend);
         send(topic, -1, k, v, null);
     }
 
@@ -76,13 +83,15 @@ public class SimpleProducer<K extends Serializable, V extends Serializable> {
                 record = new ProducerRecord<>(topic, key, value);
             else
                 record = new ProducerRecord<>(topic, partition, key, value);
-
+            System.out.println(record.value());
             Future<RecordMetadata> future = null;
             if (callback == null) {
                 future = producer.send(record);
             } else {
                 future = producer.send(record, callback);
             }
+
+            //future = producer.send(record);
             if (!syncSend) {
                 return;
             }
@@ -107,6 +116,7 @@ public class SimpleProducer<K extends Serializable, V extends Serializable> {
         @Override
         public void onCompletion(RecordMetadata recordMetadata, Exception e) {
             if (e != null) {
+                System.out.println("error: " + e.getMessage());
                 logger.error("Error while producing message to topic : {}", recordMetadata.topic(), e);
             } else
                 logger.debug("sent message to topic:{} partition:{}  offset:{}", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
